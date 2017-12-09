@@ -71,9 +71,11 @@ ghproject_tidy <- ghproject_remove %>%
                                 "Private" = "1",
                                 "Medicare" = "2",
                                 "Medicaid" = "2"),
-         losdays2_log = log(losdays2)) %>% 
-  select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-religion) 
-           
+         religion = ifelse(religion == "No Affiliation", "0", "1"),
+         losdays2_log = log(losdays2),
+         id = 1:nrow(ghproject_tidy)) %>% 
+  select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-visitid,-patientid) %>% 
+  select(id,everything())
 
 ```
 
