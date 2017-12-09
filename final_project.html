@@ -138,7 +138,8 @@ $(document).ready(function () {
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(readxl)
-library(dplyr)</code></pre>
+library(dplyr)
+library(DT)</code></pre>
 <div id="load-data-set" class="section level1">
 <h1>load data set</h1>
 <pre class="r"><code>ghproject &lt;- read_excel(&quot;~/Documents/BM1/final project/bm1_final_project/GHProject_Dataset.xlsx&quot;)</code></pre>
@@ -269,6 +270,13 @@ ghproject %&gt;%
 ##       n
 ##   &lt;int&gt;
 ## 1  3682</code></pre>
+<p>There are 3682 records from 3612 patients</p>
+<pre class="r"><code>n_occur &lt;- data.frame(table(ghproject$PatientID))
+#check the duplicated patients
+revisit_patient &lt;- ghproject[ghproject$PatientID %in% n_occur$Var1[n_occur$Freq &gt; 1],]
+
+#remove duplicated patients
+ghproject_remove &lt;- ghproject[!duplicated(ghproject[c('PatientID')]),]</code></pre>
 </div>
 
 
