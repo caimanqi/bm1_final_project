@@ -29,6 +29,10 @@ ghproject %>%
   na.omit() %>% 
   knitr::kable()
 
+#summary of categorical data
+ghproject %>% 
+  select()
+
 #summary of PatientID and VisitID
 ghproject %>% 
   distinct(PatientID) %>% 
