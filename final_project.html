@@ -141,10 +141,11 @@ $(document).ready(function () {
 library(dplyr)</code></pre>
 <div id="load-data-set" class="section level1">
 <h1>load data set</h1>
-<pre class="r"><code>Ghproject &lt;- read_excel(&quot;~/Documents/BM1/final project/GHProject_Dataset.xlsx&quot;)
-
-#summary of continuous variable
-Ghproject %&gt;% 
+<pre class="r"><code>ghproject &lt;- read_excel(&quot;~/Documents/BM1/final project/bm1_final_project/GHProject_Dataset.xlsx&quot;)</code></pre>
+<pre><code>## Warning in strptime(x, format, tz = tz): unknown timezone 'zone/tz/2017c.
+## 1.0/zoneinfo/America/New_York'</code></pre>
+<pre class="r"><code>#summary of continuous variable
+ghproject %&gt;% 
   select(LOSDays2, Evisit, AgeYear, BMI:FacilityZip) %&gt;% 
   summary() %&gt;% 
   na.omit() %&gt;% 
@@ -253,6 +254,21 @@ Ghproject %&gt;%
 </tr>
 </tbody>
 </table>
+<pre class="r"><code>#summary of PatientID and VisitID
+ghproject %&gt;% 
+  distinct(PatientID) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1  3612</code></pre>
+<pre class="r"><code>ghproject %&gt;% 
+  distinct(VisitID) %&gt;% 
+  count()</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1  3682</code></pre>
 </div>
 
 

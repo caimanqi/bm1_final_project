@@ -19,13 +19,24 @@ library(dplyr)
 
 #load data set
 ```{r}
-Ghproject <- read_excel("~/Documents/BM1/final project/GHProject_Dataset.xlsx")
+ghproject <- read_excel("~/Documents/BM1/final project/bm1_final_project/GHProject_Dataset.xlsx")
 
 #summary of continuous variable
-Ghproject %>% 
+ghproject %>% 
   select(LOSDays2, Evisit, AgeYear, BMI:FacilityZip) %>% 
   summary() %>% 
   na.omit() %>% 
   knitr::kable()
+
+#summary of PatientID and VisitID
+ghproject %>% 
+  distinct(PatientID) %>% 
+  count()
+
+ghproject %>% 
+  distinct(VisitID) %>% 
+  count()
+
+
 ```
 

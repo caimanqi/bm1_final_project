@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512848365632.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "FC37FF9C",
+    "lastKnownWriteTime" : 4294967302,
+    "last_content_update" : 1512848365632,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "6F627B2B",
+        "caption" : "Ghproject",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Ghproject&cache_key=6F627B2B",
+        "displayedObservations" : 3682,
+        "environment" : "",
+        "object" : "Ghproject",
+        "preview" : 0,
+        "totalObservations" : 3682,
+        "variables" : 26
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
