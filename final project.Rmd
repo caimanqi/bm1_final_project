@@ -58,7 +58,14 @@ ghproject_remove <- ghproject[!duplicated(ghproject[c('patientid')]),]
 ##recode gender
 ghproject_tidy <- ghproject_remove %>% 
   mutate(gender = ifelse(gender == "Male", "1","0" )) %>% 
-  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0")) 
+  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"),
+         cindex = recode(cindex,
+                         "0" = "0",
+                         "1" = "0",
+                         "2" = "1",
+                         "3" = "1",
+                         "4" = "2",
+                         "5" = "2")) 
 
 ```
 

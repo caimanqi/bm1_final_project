@@ -139,15 +139,17 @@ $(document).ready(function () {
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(readxl)
 library(dplyr)
-library(DT)</code></pre>
+library(DT)
+library(janitor)</code></pre>
 <div id="load-data-set" class="section level1">
 <h1>load data set</h1>
-<pre class="r"><code>ghproject &lt;- read_excel(&quot;~/Documents/BM1/final project/bm1_final_project/GHProject_Dataset.xlsx&quot;)</code></pre>
+<pre class="r"><code>ghproject &lt;- read_excel(&quot;GHProject_Dataset.xlsx&quot;) %&gt;% 
+  clean_names()</code></pre>
 <pre><code>## Warning in strptime(x, format, tz = tz): unknown timezone 'zone/tz/2017c.
 ## 1.0/zoneinfo/America/New_York'</code></pre>
 <pre class="r"><code>#summary of continuous variable
 ghproject %&gt;% 
-  select(LOSDays2, Evisit, AgeYear, BMI:FacilityZip) %&gt;% 
+  select(losdays2, evisit, ageyear, bmi:facilityzip) %&gt;% 
   summary() %&gt;% 
   na.omit() %&gt;% 
   knitr::kable()</code></pre>
@@ -155,17 +157,17 @@ ghproject %&gt;%
 <thead>
 <tr class="header">
 <th></th>
-<th align="center">LOSDays2</th>
-<th align="center">Evisit</th>
-<th align="center">AgeYear</th>
-<th align="center">BMI</th>
-<th align="center">BPSYSTOLIC</th>
-<th align="center">O2SAT</th>
-<th align="center">TEMPERATURE</th>
-<th align="center">HEARTRATE</th>
-<th align="left">RESPIRATIONRATE</th>
-<th align="center">BPDIASTOLIC</th>
-<th align="center">FacilityZip</th>
+<th align="center">losdays2</th>
+<th align="center">evisit</th>
+<th align="center">ageyear</th>
+<th align="center">bmi</th>
+<th align="center">bpsystolic</th>
+<th align="center">o2sat</th>
+<th align="center">temperature</th>
+<th align="center">heartrate</th>
+<th align="left">respirationrate</th>
+<th align="center">bpdiastolic</th>
+<th align="center">facilityzip</th>
 </tr>
 </thead>
 <tbody>
@@ -261,26 +263,38 @@ ghproject %&gt;%
 <pre><code>## # A tibble: 3,682 x 0</code></pre>
 <pre class="r"><code>#summary of PatientID and VisitID
 ghproject %&gt;% 
-  distinct(PatientID) %&gt;% 
+  distinct(patientid) %&gt;% 
   count()</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##       n
 ##   &lt;int&gt;
 ## 1  3612</code></pre>
 <pre class="r"><code>ghproject %&gt;% 
-  distinct(VisitID) %&gt;% 
+  distinct(visitid) %&gt;% 
   count()</code></pre>
 <pre><code>## # A tibble: 1 x 1
 ##       n
 ##   &lt;int&gt;
 ## 1  3682</code></pre>
 <p>There are 3682 records from 3612 patients</p>
-<pre class="r"><code>n_occur &lt;- data.frame(table(ghproject$PatientID))
+<pre class="r"><code>n_occur &lt;- data.frame(table(ghproject$patientid))
 #check the duplicated patients
-revisit_patient &lt;- ghproject[ghproject$PatientID %in% n_occur$Var1[n_occur$Freq &gt; 1],]
+revisit_patient &lt;- ghproject[ghproject$patientid %in% n_occur$Var1[n_occur$Freq &gt; 1],]
 
 #remove duplicated patients
-ghproject_remove &lt;- ghproject[!duplicated(ghproject[c('PatientID')]),]</code></pre>
+ghproject_remove &lt;- ghproject[!duplicated(ghproject[c('patientid')]),]
+
+##recode gender
+ghproject_tidy &lt;- ghproject_remove %&gt;% 
+  mutate(gender = ifelse(gender == &quot;Male&quot;, &quot;1&quot;,&quot;0&quot; )) %&gt;% 
+  mutate(maritalstatus = ifelse(maritalstatus == &quot;Married&quot;,&quot;1&quot;,&quot;0&quot;),
+         cindex = recode(cindex,
+                         &quot;0&quot; = &quot;0&quot;,
+                         &quot;1&quot; = &quot;0&quot;,
+                         &quot;2&quot; = &quot;1&quot;,
+                         &quot;3&quot; = &quot;1&quot;,
+                         &quot;4&quot; = &quot;2&quot;,
+                         &quot;5&quot; = &quot;2&quot;)) </code></pre>
 </div>
 
 
