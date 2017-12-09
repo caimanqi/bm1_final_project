@@ -1,0 +1,31 @@
+---
+title: "Final_project_bm"
+author: "Manqi Cai"
+date: "12/9/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Data Analytics group from Good Health Corporation are interested in improving the overall hospital management and minimizing the cost/resources associated with patients’ care. One of the most important outcomes that has a direct effect on these aspects is patient’s length of stay (LoS) in the hospital. Thus, they would like to know which variables are associated with LoS, and ultimately build a predictive model to be used for future visits. The group has contacted you to study this problem and make a recommendation.
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+```
+
+#load data set
+```{r}
+Ghproject <- read_excel("~/Documents/BM1/final project/GHProject_Dataset.xlsx")
+
+#summary of continuous variable
+Ghproject %>% 
+  select(LOSDays2, Evisit, AgeYear, BMI:FacilityZip) %>% 
+  summary() %>% 
+  na.omit() %>% 
+  knitr::kable()
+```
+
