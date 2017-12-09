@@ -20,7 +20,7 @@ library(DT)
 
 #load data set
 ```{r}
-ghproject <- read_excel("~/Documents/BM1/final project/bm1_final_project/GHProject_Dataset.xlsx")
+ghproject <- read_excel("GHProject_Dataset.xlsx")
 
 #summary of continuous variable
 ghproject %>% 
