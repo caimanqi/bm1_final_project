@@ -1,8 +1,8 @@
 ---
-title: "Final_project_bm"
-author: "Manqi Cai"
+title: "Biostatistics Methods 1 Final Project"
+author: "Manqi Cai, Yixi Xu, Peng-Lin Lin, Kaitlin Maciejewski"
 date: "12/9/2017"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -73,7 +73,7 @@ ghproject_tidy <- ghproject_remove %>%
                                 "Medicaid" = "2"),
          religion = ifelse(religion == "No Affiliation", "0", "1"),
          losdays2_log = log(losdays2),
-         id = 1:nrow(ghproject_tidy)) %>% 
+         id = 1:nrow(ghproject_remove)) %>% 
   select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-visitid,-patientid) %>% 
   select(id,everything())
 
