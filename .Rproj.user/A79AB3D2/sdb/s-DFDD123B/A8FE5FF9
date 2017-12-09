@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1512849548278.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A8FE5FF9",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1512849548278,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "EEC9FCCB",
+        "caption" : "revisit_patient",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=revisit_patient&cache_key=EEC9FCCB",
+        "displayedObservations" : 139,
+        "environment" : "",
+        "object" : "revisit_patient",
+        "preview" : 0,
+        "totalObservations" : 139,
+        "variables" : 26
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
