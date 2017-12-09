@@ -65,7 +65,15 @@ ghproject_tidy <- ghproject_remove %>%
                          "2" = "1",
                          "3" = "1",
                          "4" = "2",
-                         "5" = "2")) 
+                         "5" = "2"),
+         insurancetype = recode(insurancetype,
+                                "NA" = "0",
+                                "Private" = "1",
+                                "Medicare" = "2",
+                                "Medicaid" = "2"),
+         losdays2_log = log(losdays2)) %>% 
+  select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-religion) 
+           
 
 ```
 
