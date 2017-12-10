@@ -92,7 +92,10 @@ ghproject_tidy <- ghproject_remove %>%
          losdays2_log = log(losdays2),
          id = 1:nrow(ghproject_remove)) %>% 
   select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-visitid,-patientid) %>% 
-  select(id,everything())
+  select(id,everything()) %>% na.omit()
+
 
 ```
 
+#library(readr)
+#write_csv(ghproject_tidy,"tidy.csv")
