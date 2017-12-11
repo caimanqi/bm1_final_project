@@ -6,6 +6,8 @@ library(janitor)
 library(stringr)
 library(lubridate)
 
+### clean data, recode categorical variables, remove unneeded variables, omit na
+
 GHProject_Dataset <- read_excel("GHProject_Dataset.xlsx") %>% clean_names() #load data
 
 n_occur <- data.frame(table(patientid))
@@ -15,9 +17,9 @@ revisit_patient <- GHProject_Dataset[GHProject_Dataset$patientid %in% n_occur$Va
 #remove duplicated patients
 ghproject_remove <- GHProject_Dataset[!duplicated(GHProject_Dataset[c('patientid')]),]
 
-##recode gender
+##recode variables
 ghproject_tidy <- ghproject_remove %>% 
-  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode male
+  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode gender
   mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"), #recode marital status
          cindex = recode(cindex, #recode cindex
                          "0" = "0",
@@ -88,12 +90,37 @@ ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurance
 
 ###
 
-#install.packages("GGally")
+# install.packages("GGally")
 library(GGally)
 # correlation matrix for numeric variables
 ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
 
+# no significant linear trend ??
 
 ###
 
-write_csv(ghproject_tidy, "ghproject_saturated.csv")
+# write csv for use in SAS
+# write_csv(ghproject_tidy, "ghproject_saturated.csv")
+
+# SAS output:
+
+### Forward
+# significant variables:
+# ageyear, evisit, bpdystolic, cindex, heartrate, is30daysreadmit, respirationrate
+# Adj-R^2: 0.1169
+# AIC: 1743.8
+
+### Backward
+# significant variables:
+# month, mews, icu_flag, temperature, bmi, o2sat, religion, gender, bpdiastolic, maritalstatus, insurancetype
+# Adj-R^2: 0.1169
+# AIC: 1743.8
+
+### Stepwise
+# significant variables:
+# ageyear, evisit, bpdystolic, cindex, heartrate, is30daysreadmit, respirationrate
+# Adj-R^2: 0.1169
+# AIC: 1743.8
+
+## since Forward and Stepwise agree, and using principle of parsimony, choose smaller model
+

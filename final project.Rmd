@@ -2,36 +2,41 @@
 title: "Biostatistics Methods 1 Final Project"
 author: "Manqi Cai, Yixi Xu, Peng-Lin Lin, Kaitlin Maciejewski"
 date: "12/9/2017"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 ```
 
-The Data Analytics group from Good Health Corporation are interested in improving the overall hospital management and minimizing the cost/resources associated with patients’ care. One of the most important outcomes that has a direct effect on these aspects is patient’s length of stay (LoS) in the hospital. Thus, they would like to know which variables are associated with LoS, and ultimately build a predictive model to be used for future visits. The group has contacted you to study this problem and make a recommendation.
+The Data Analytics group from Good Health Corporation are interested in improving the overall hospital management and minimizing the cost/resources associated with patients' care. One of the most important outcomes that has a direct effect on these aspects is patient's length of stay (LoS) in the hospital. Thus, they would like to know which variables are associated with LoS, and ultimately build a predictive model to be used for future visits. The group has contacted you to study this problem and make a recommendation.
 
-```{r}
+```{r, warning=F, message=F, include=F}
 library(tidyverse)
 library(readxl)
 library(dplyr)
 library(DT)
 library(janitor)
+library(stringr)
+library(lubridate)
+library(knitr)
+library(GGally) # correlation matrix
 ```
 
-#load data set
-```{r}
+
+```{r load_data_set}
 ghproject <- read_excel("GHProject_Dataset.xlsx") %>% 
   clean_names()
 
 #summary of continuous variable
 ghproject %>% 
-  select(losdays2, evisit, ageyear, bmi:facilityzip) %>% 
+  select(losdays2, evisit, ageyear, bmi:bpdiastolic) %>% 
   summary() %>% 
   na.omit() %>% 
   knitr::kable()
 
 #summary of categorical data
+##### NEEDS TO BE DONE #####
 ghproject %>% 
   select()
 
@@ -47,31 +52,29 @@ ghproject %>%
 ```
 There are 3682 records from 3612 patients
 
-```{r remove duplicated patients}
-n_occur <- data.frame(table(ghproject$patientid))
-#check the duplicated patients
-revisit_patient <- ghproject[ghproject$patientid %in% n_occur$Var1[n_occur$Freq > 1],]
+```{r clean_data}
+GHProject_Dataset <- read_excel("GHProject_Dataset.xlsx") %>% clean_names() #load data
 
 #remove duplicated patients
-ghproject_remove <- ghproject[!duplicated(ghproject[c('patientid')]),]
+ghproject_remove <- GHProject_Dataset[!duplicated(GHProject_Dataset[c('patientid')]),]
 
-##recode gender
+##recode variables
 ghproject_tidy <- ghproject_remove %>% 
-  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% 
-  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"),
-         cindex = recode(cindex,
+  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode gender
+  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"), #recode marital status
+         cindex = recode(cindex, #recode cindex
                          "0" = "0",
                          "1" = "0",
                          "2" = "1",
                          "3" = "1",
                          "4" = "2",
                          "5" = "2"),
-         insurancetype = recode(insurancetype,
+         insurancetype = recode(insurancetype, #recode insurance type
                                 "NA" = "0",
                                 "Private" = "1",
                                 "Medicare" = "2",
-                                "Medicaid" = "2"),
-         mews = recode(mews,
+                                "Medicaid" = "3"),
+         mews = recode(mews, #recode mews
                        "NA" = "0",
                        "0" = "1",
                        "1" = "1",
@@ -88,14 +91,108 @@ ghproject_tidy <- ghproject_remove %>%
                        "12"= "4",
                        "13"= "4",
                        "14" = "4"),
-         religion = ifelse(religion == "No Affiliation", "0", "1"),
+         religion = ifelse(religion == "No Affiliation", "0", "1"), #recode religion
          losdays2_log = log(losdays2),
          id = 1:nrow(ghproject_remove)) %>% 
-  select(-(bmi:facilityzip), -facilityname,-admitdtm,-loshours,-postalcode,-race,-visitid,-patientid) %>% 
-  select(id,everything()) %>% na.omit()
+  separate(admitdtm, into= c("day", "month", "year"), sep = ", ", convert = TRUE) %>% #recode admission date to month
+  mutate(month = str_replace(month, "[0-9]", ""))%>% 
+  mutate(month = str_replace(month, "[0-9]", ""))%>%
+  mutate(month = str_replace(month, " ", ""))%>%
+  mutate(month = recode(month,
+                        "January" = "1",
+                        "February" = "2",
+                        "March" = "3",
+                        "April" = "4",
+                        "May" = "5",
+                        "June" = "6",
+                        "July" = "7",
+                        "August" = "8",
+                        "September" = "9",
+                        "October" = "10",
+                        "November" = "11",
+                        "December" = "12")) %>% 
+  select(-c(day, year, patientid, visitid, postalcode, facilityname, facilityzip, race)) %>% #remove unneeded variables
+    na.omit() 
 
+ghproject_tidy$mews <- as.integer(as.character(ghproject_tidy$mews))
+
+ghproject_tidy$cindex <- as.integer(as.character(ghproject_tidy$cindex))
+
+ghproject_tidy$month <- as.integer(as.character(ghproject_tidy$month))
+
+ghproject_tidy$gender <- as.integer(as.character(ghproject_tidy$gender))
+
+ghproject_tidy$religion <- as.integer(as.character(ghproject_tidy$religion))
+
+ghproject_tidy$maritalstatus <- as.integer(as.character(ghproject_tidy$maritalstatus))
+
+ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurancetype))
 
 ```
 
-#library(readr)
-#write_csv(ghproject_tidy,"tidy.csv")
+
+```{r correlation_matrix}
+# correlation matrix for numeric variables, saturated
+ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
+
+# no significant linear trend ??
+
+# correlation matrix, from smaller SAS model
+ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic", "heartrate","respirationrate", "losdays2_log"))
+```
+
+```{r write_csv_for_SAS, eval=FALSE}
+write_csv(ghproject_tidy, "ghproject_saturated.csv")
+```
+
+
+#SAS output:
+
+##Forward
+
+###significant variables:
+ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+
+##Backward
+
+###significant variables:
+month, mews, icu_flag, temperature, bmi, o2sat, religion, gender, bpdiastolic, maritalstatus, insurancetype
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+
+##Stepwise
+
+###significant variables:
+ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+since Forward and Stepwise agree, and using principle of parsimony, choose smaller model
+
+```{r}
+#Use criterion-based procedures to guide your selection of the ‘best subset’ (Cp, AIC, BIC, ...)
+```
+
+
+```{r linear_model}
+reg <- lm(losdays2_log ~ ageyear + evisit + bpsystolic + cindex + heartrate + is30dayreadmit + respirationrate, ghproject_tidy)
+
+summary(reg)
+
+confint(reg)
+
+par(mfrow=c(2,2))
+plot(reg)
+```
+
+
