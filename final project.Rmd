@@ -21,6 +21,7 @@ library(stringr)
 library(lubridate)
 library(knitr)
 library(GGally) # correlation matrix
+library(ggplot2)
 ```
 
 
@@ -58,6 +59,8 @@ GHProject_Dataset <- read_excel("GHProject_Dataset.xlsx") %>% clean_names() #loa
 #remove duplicated patients
 ghproject_remove <- GHProject_Dataset[!duplicated(GHProject_Dataset[c('patientid')]),]
 
+
+#
 ##recode variables
 ghproject_tidy <- ghproject_remove %>% 
   mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode gender
@@ -141,6 +144,18 @@ ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2s
 ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic", "heartrate","respirationrate", "losdays2_log"))
 ```
 
+```{r}
+ghproject_tidy %>% 
+  mutate(heartrate_log = log(heartrate)) %>% 
+  ggplot(aes(x = heartrate_log)) +
+  geom_histogram()
+
+ghproject_tidy %>% 
+  ggplot(aes(x = heartrate)) +
+  geom_histogram()
+```
+
+
 ```{r write_csv_for_SAS, eval=FALSE}
 write_csv(ghproject_tidy, "ghproject_saturated.csv")
 ```
@@ -184,8 +199,8 @@ since Forward and Stepwise agree, and using principle of parsimony, choose small
 ```
 
 
-```{r linear_model}
-reg <- lm(losdays2_log ~ ageyear + evisit + bpsystolic + cindex + heartrate + is30dayreadmit + respirationrate, ghproject_tidy)
+```{r linear_model for stepwise}
+reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear + month + cindex + evisit + ageyear + gender + religion + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
 
 summary(reg)
 
@@ -194,5 +209,4 @@ confint(reg)
 par(mfrow=c(2,2))
 plot(reg)
 ```
-
 
