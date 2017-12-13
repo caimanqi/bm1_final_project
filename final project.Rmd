@@ -40,7 +40,44 @@ ghproject %>%
 #summary of categorical data
 ##### NEEDS TO BE DONE #####
 ghproject %>% 
-  select()
+  group_by(mews) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(cindex) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(evisit) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(icu_flag) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(gender) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(race) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(religion) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(maritalstatus) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(facilityname) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(insurancetype) %>% 
+  summarize(n())
 
 #summary of PatientID and VisitID
 ghproject %>% 
@@ -96,7 +133,7 @@ ghproject_tidy <- ghproject_remove %>%
                        "13"= "4",
                        "14" = "4"),
          religion = ifelse(religion == "No Affiliation", "0", "1"), #recode religion
-         losdays2_log = log(losdays2),
+         losdays2_log = log(losdays2)+0.0001,
          id = 1:nrow(ghproject_remove)) %>% 
   separate(admitdtm, into= c("day", "month", "year"), sep = ", ", convert = TRUE) %>% #recode admission date to month
   mutate(month = str_replace(month, "[0-9]", ""))%>% 
@@ -134,6 +171,22 @@ ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurance
 
 ```
 
+```{r exploratory}
+attach(ghproject_tidy)
+
+hist(losdays2)
+hist(sqrt(losdays2))
+hist(losdays2_log)
+
+hist(ageyear)
+#hist(bmi)
+hist(bpsystolic)
+hist(log(o2sat))
+#hist(temperature)
+hist(log(heartrate))
+hist(log(respirationrate))
+hist(bpdiastolic)
+```
 
 ```{r correlation_matrix}
 # correlation matrix for numeric variables, saturated
@@ -197,9 +250,46 @@ All models agree
 #Use criterion-based procedures to guide your selection of the ‘best subset’ (Cp, AIC, BIC, ...)
 ```
 
+```{r linear_model_each}
+reg_30 <- lm(losdays2_log ~ is30dayreadmit, ghproject_tidy)
+summary(reg_30)
 
-```{r linear_model from stepwise}
-reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear +  cindex + evisit + ageyear + gender +  maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
+reg_cindex <- lm(losdays2_log ~ cindex, ghproject_tidy)
+summary(reg_cindex)
+
+reg_evisit <- lm(losdays2_log ~ evisit, ghproject_tidy)
+summary(reg_evisit)
+
+reg_age <- lm(losdays2_log ~ ageyear, ghproject_tidy)
+summary(reg_age)
+
+reg_gender <- lm(losdays2_log ~ gender, ghproject_tidy)
+summary(reg_gender)
+
+reg_marital <- lm(losdays2_log ~ maritalstatus, ghproject_tidy)
+summary(reg_marital)
+
+reg_insurance <- lm(losdays2_log ~ insurancetype, ghproject_tidy)
+summary(reg_insurance)
+
+reg_bps <- lm(losdays2_log ~ bpsystolic, ghproject_tidy)
+summary(reg_bps)
+
+reg_o2 <- lm(losdays2_log ~ o2sat, ghproject_tidy)
+summary(reg_o2)
+
+reg_heart <- lm(losdays2_log ~ heartrate, ghproject_tidy)
+summary(reg_heart)
+
+reg_resp <- lm(losdays2_log ~ respirationrate, ghproject_tidy)
+summary(reg_resp)
+
+reg_bpd <- lm(losdays2_log ~ bpdiastolic, ghproject_tidy)
+summary(reg_bpd)
+```
+
+```{r full_linear_model}
+reg <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex + evisit + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate, ghproject_tidy)
 
 summary(reg)
 
