@@ -31,10 +31,11 @@ ghproject <- read_excel("GHProject_Dataset.xlsx") %>%
 
 #summary of continuous variable
 ghproject %>% 
-  select(losdays2, evisit, ageyear, bmi:bpdiastolic) %>% 
+  select(losdays2, ageyear, bmi:bpdiastolic) %>% 
   summary() %>% 
   na.omit() %>% 
   knitr::kable()
+
 
 #summary of categorical data
 ##### NEEDS TO BE DONE #####
@@ -136,12 +137,10 @@ ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurance
 
 ```{r correlation_matrix}
 # correlation matrix for numeric variables, saturated
-ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
+ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
 
 # no significant linear trend ??
 
-# correlation matrix, from smaller SAS model
-ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic", "heartrate","respirationrate", "losdays2_log"))
 ```
 
 ```{r}
@@ -166,41 +165,41 @@ write_csv(ghproject_tidy, "ghproject_saturated.csv")
 ##Forward
 
 ###significant variables:
-ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+is30dayreadmit + ageyear +  cindex + evisit + ageyear + gender +  maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic
 
-AdjR2: 0.1169
+AdjR2: 0.1299
 
-AIC: 1743.8
+AIC: 1726.79
 
 
 ##Backward
 
 ###significant variables:
-month, mews, icu_flag, temperature, bmi, o2sat, religion, gender, bpdiastolic, maritalstatus, insurancetype
+is30dayreadmit + ageyear +  cindex + evisit + ageyear + gender +  maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic
 
-AdjR2: 0.1169
+AdjR2: 0.1299
 
-AIC: 1743.8
+AIC: 1726.79
 
 
 ##Stepwise
 
 ###significant variables:
-ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+is30dayreadmit + ageyear +  cindex + evisit + ageyear + gender +  maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic
 
-AdjR2: 0.1169
+AdjR2: 0.1299
 
-AIC: 1743.8
+AIC: 1726.79
 
-since Forward and Stepwise agree, and using principle of parsimony, choose smaller model
+All models agree
 
 ```{r}
 #Use criterion-based procedures to guide your selection of the ‘best subset’ (Cp, AIC, BIC, ...)
 ```
 
 
-```{r linear_model for stepwise}
-reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear + month + cindex + evisit + ageyear + gender + religion + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
+```{r linear_model from stepwise}
+reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear +  cindex + evisit + ageyear + gender +  maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
 
 summary(reg)
 
@@ -219,7 +218,7 @@ set.seed(1)
 
 # Our usual regression, no bootstrap yet
 boot.fn<-function(data, index){
-	return(coef(lm(losdays2_log ~ + is30dayreadmit + ageyear + month + cindex + evisit + ageyear + gender + religion + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic,data=ghproject_tidy,subset=index)))
+	return(coef(lm(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + ageyear + gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=ghproject_tidy,subset=index)))
 }
 boot.fn(ghproject_tidy,1:2709)
 
