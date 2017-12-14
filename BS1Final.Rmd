@@ -1,0 +1,368 @@
+---
+title: "Biostatistics Methods 1 Final Project"
+author: "Manqi Cai, Yixi Xu, Peng-Lin Lin, Kaitlin Maciejewski"
+date: "12/9/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+The Data Analytics group from Good Health Corporation are interested in improving the overall hospital management and minimizing the cost/resources associated with patients' care. One of the most important outcomes that has a direct effect on these aspects is patient's length of stay (LoS) in the hospital. Thus, they would like to know which variables are associated with LoS, and ultimately build a predictive model to be used for future visits. The group has contacted you to study this problem and make a recommendation.
+
+```{r, warning=F, message=F, include=F}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(DT)
+library(janitor)
+library(stringr)
+library(lubridate)
+library(knitr)
+library(GGally) # correlation matrix
+library(ggplot2)
+```
+
+
+```{r load_data_set, include=F}
+ghproject <- read_excel("GHProject_Dataset.xlsx") %>% 
+  clean_names()
+
+#summary of continuous variable
+ghproject %>% 
+  select(loshours,losdays2, ageyear, bmi:bpdiastolic) %>% 
+  summary() %>% 
+  knitr::kable()
+
+attach(ghproject)
+
+sd(loshours, na.rm = T)
+
+sd(losdays2, na.rm = T)
+
+sd(ageyear, na.rm = T)
+
+sd(bmi, na.rm = T)
+
+sd(bpdiastolic, na.rm = T)
+
+sd(o2sat, na.rm = T)
+
+sd(temperature, na.rm = T)
+
+sd(heartrate, na.rm = T)
+
+sd(respirationrate, na.rm = T)
+
+sd(bpsystolic, na.rm = T)
+
+#summary of categorical data
+ghproject %>% 
+  group_by(mews) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(cindex) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(evisit) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(icu_flag) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(gender) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(race) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(religion) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(maritalstatus) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(facilityname) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(insurancetype) %>% 
+  summarize(n())
+
+#summary of PatientID and VisitID
+ghproject %>% 
+  distinct(patientid) %>% 
+  count()
+
+ghproject %>% 
+  distinct(visitid) %>% 
+  count()
+
+```
+There are 3682 records from 3612 patients
+
+\begin{table}[h!]
+\centering
+\caption{Summary of Numerical Patient Data}
+\label{my-label}
+\begin{tabular}{lllllll}
+                                           & Min   & Max    & Mean   & Median & Sd     & Missing \\ \cline{2-7} 
+\multicolumn{1}{l|}{Length of Stay, hours} & 1     & 2111   & 131.8  & 92.0   & 142.35 &         \\
+\multicolumn{1}{l|}{Length of Stay, days}  & 0.04  & 87.96  & 5.49   & 3.83   & 5.93   &         \\
+\multicolumn{1}{l|}{Age}                   & 18.00 & 105    & 65.74  & 68.00  & 18.66  &         \\
+\multicolumn{1}{l|}{BMI}                   & 3.10  & 122.65 & 28.33  & 27.10  & 7.96   & 697     \\
+\multicolumn{1}{l|}{BP Systolic}           & 88.78 & 193.96 & 130.52 & 129.17 & 9.83   & 5       \\
+\multicolumn{1}{l|}{O2 Saturation}         & 80    & 236.53 & 97.85  & 97.58  & 4.86   & 3       \\
+\multicolumn{1}{l|}{Temperature}           & 11.85 & 52.27  & 36.73  & 36.73  & 0.91   & 3       \\
+\multicolumn{1}{l|}{Heart Rate}            & 37.58 & 242.58 & 80.09  & 79.20  & 12.97  & 5       \\
+\multicolumn{1}{l|}{Respiration Rate}      & 12    & 67.72  & 18.20  & 17.76  & 2.65   & 3       \\
+\multicolumn{1}{l|}{BP Diastolic}          & 29.56 & 154.4  & 72.53  & 71.85  & 16.78  & 1       \\
+                                           &       &        &        &        &        &        
+\end{tabular}
+\end{table}
+
+```{r clean_data, include=F}
+GHProject_Dataset <- read_excel("GHProject_Dataset.xlsx") %>% clean_names() #load data
+
+#remove duplicated patients
+ghproject_remove <- GHProject_Dataset[!duplicated(GHProject_Dataset[c('patientid')]),]
+
+
+#
+##recode variables
+ghproject_tidy <- ghproject_remove %>% 
+  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode gender
+  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"), #recode marital status
+         cindex = recode(cindex, #recode cindex
+                         "0" = "0",
+                         "1" = "0",
+                         "2" = "1",
+                         "3" = "1",
+                         "4" = "2",
+                         "5" = "2"),
+         insurancetype = recode(insurancetype, #recode insurance type
+                                "NA" = "0",
+                                "Private" = "1",
+                                "Medicare" = "2",
+                                "Medicaid" = "3"),
+         mews = recode(mews, #recode mews
+                       "NA" = "0",
+                       "0" = "1",
+                       "1" = "1",
+                       "2" = "2",
+                       "3" = "2",
+                       "4" = "3",
+                       "5" = "3",
+                       "6"= "4",
+                       "7"= "4",
+                       "8"= "4",
+                       "9"= "4",
+                       "10"= "4",
+                       "11"= "4",
+                       "12"= "4",
+                       "13"= "4",
+                       "14" = "4"),
+         religion = ifelse(religion == "No Affiliation", "0", "1"), #recode religion
+         losdays2_log = log(losdays2),
+         id = 1:nrow(ghproject_remove)) %>% 
+  separate(admitdtm, into= c("day", "month", "year"), sep = ", ", convert = TRUE) %>% #recode admission date to month
+  mutate(month = str_replace(month, "[0-9]", ""))%>% 
+  mutate(month = str_replace(month, "[0-9]", ""))%>%
+  mutate(month = str_replace(month, " ", ""))%>%
+  mutate(month = recode(month,
+                        "January" = "1",
+                        "February" = "2",
+                        "March" = "3",
+                        "April" = "4",
+                        "May" = "5",
+                        "June" = "6",
+                        "July" = "7",
+                        "August" = "8",
+                        "September" = "9",
+                        "October" = "10",
+                        "November" = "11",
+                        "December" = "12")) %>% 
+  select(-c(day, year, patientid, visitid, postalcode, facilityname, facilityzip, race)) %>% #remove unneeded variables
+    na.omit() 
+
+ghproject_tidy$mews <- as.integer(as.character(ghproject_tidy$mews))
+
+ghproject_tidy$cindex <- as.integer(as.character(ghproject_tidy$cindex))
+
+ghproject_tidy$month <- as.integer(as.character(ghproject_tidy$month))
+
+ghproject_tidy$gender <- as.integer(as.character(ghproject_tidy$gender))
+
+ghproject_tidy$religion <- as.integer(as.character(ghproject_tidy$religion))
+
+ghproject_tidy$maritalstatus <- as.integer(as.character(ghproject_tidy$maritalstatus))
+
+ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurancetype))
+
+```
+
+```{r exploratory, include=F}
+attach(ghproject_tidy)
+
+hist(losdays2)
+hist(sqrt(losdays2))
+hist(losdays2_log)
+
+hist(ageyear)
+#hist(bmi)
+hist(bpsystolic)
+hist(o2sat)
+#hist(temperature)
+hist(heartrate)
+hist(respirationrate)
+hist(bpdiastolic)
+```
+
+```{r correlation_matrix, include=F}
+# correlation matrix for numeric variables, saturated
+ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
+
+# no significant linear trend ??
+
+```
+
+
+```{r write_csv_for_SAS, eval=FALSE, include = F}
+write_csv(ghproject_tidy, "ghproject_saturated.csv")
+```
+
+
+#SAS output:
+
+##Forward
+
+###significant variables:
+ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+
+##Backward
+
+###significant variables:
+month, mews, icu_flag, temperature, bmi, o2sat, religion, gender, bpdiastolic, maritalstatus, insurancetype
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+
+##Stepwise
+
+###significant variables:
+ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
+
+AdjR2: 0.1169
+
+AIC: 1743.8
+
+
+All models agree
+
+
+
+```{r linear_model_each, include=F}
+reg_30 <- lm(losdays2_log ~ is30dayreadmit, ghproject_tidy)
+summary(reg_30)
+
+reg_cindex <- lm(losdays2_log ~ cindex, ghproject_tidy)
+summary(reg_cindex)
+
+reg_evisit <- lm(losdays2_log ~ evisit, ghproject_tidy)
+summary(reg_evisit)
+
+reg_age <- lm(losdays2_log ~ ageyear, ghproject_tidy)
+summary(reg_age)
+
+reg_gender <- lm(losdays2_log ~ gender, ghproject_tidy)
+summary(reg_gender)
+
+reg_marital <- lm(losdays2_log ~ maritalstatus, ghproject_tidy)
+summary(reg_marital)
+
+reg_insurance <- lm(losdays2_log ~ insurancetype, ghproject_tidy)
+summary(reg_insurance)
+
+reg_bps <- lm(losdays2_log ~ bpsystolic, ghproject_tidy)
+summary(reg_bps)
+
+reg_o2 <- lm(losdays2_log ~ o2sat, ghproject_tidy)
+summary(reg_o2)
+
+reg_heart <- lm(losdays2_log ~ heartrate, ghproject_tidy)
+summary(reg_heart)
+
+reg_resp <- lm(losdays2_log ~ respirationrate, ghproject_tidy)
+summary(reg_resp)
+
+reg_bpd <- lm(losdays2_log ~ bpdiastolic, ghproject_tidy)
+summary(reg_bpd)
+```
+
+```{r full_linear_model, include=F}
+reg <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex  + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate, ghproject_tidy)
+
+summary(reg)
+
+confint(reg)
+
+par(mfrow=c(2,2))
+plot(reg)
+```
+
+```{r remove_outliers}
+
+#identifies which observations to remove
+stu_res <- rstandard(reg)
+outlier <- stu_res[abs(stu_res) > 2.5]
+
+is.outlier = function(value, vector){
+  value %in% outlier
+}
+
+data_no_outliers = ghproject_tidy %>%
+  mutate(outlier = is.outlier(stu_res, outlier))%>%
+  filter(outlier == FALSE)
+
+#refit model with no outliers
+reg_no_outliers <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex  + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate, data_no_outliers)
+
+summary(reg_no_outliers)
+
+confint(reg_no_outliers)
+
+par(mfrow=c(2,2))
+plot(reg_no_outliers)
+```
+
+```{r, include=F}
+# load the library
+library(caret)
+# define training control
+train_control <- trainControl(method="cv", number=10)
+# fix the parameters of the algorithm
+grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
+# train the model
+model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=data_no_outliers, trControl=train_control, method='lm')
+# summarize results
+print(model)
+```
+
+The MSE we get from bootstrap model is 0.832, and MSE in our model is 0.831, the difference between these two MSE is about 0.1%, which is a lot less than 10%. Therefore, after model validation, we think our model is reasonalbe for predict LOS. 
+
