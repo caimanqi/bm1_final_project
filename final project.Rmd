@@ -212,8 +212,6 @@ plot(reg)
 
 ```{r}
 library(boot)     
-# For cv.glm()
-
 ##bootstrap
 set.seed(1)
 
@@ -224,15 +222,15 @@ boot.fn<-function(data, index){
 boot.fn(ghproject_tidy,1:2709)
 
 # Compute the estimates by sampling with replacement
-# Sample chooses 392 observations from 392, with replacement
+# Sample chooses 2709 observations from 2709, with replacement
 # Might have duplicates
 set.seed(1)
 
 # One draw
 boot.fn(ghproject_tidy,sample(2709,2709,replace=T))
 
-# Use function boot() to repeat the sampling 10000 times.
-# Repeat 10000 times to get the estimates, SEs ad bias
+# Use function boot() to repeat the sampling 1000 times.
+# Repeat 1000 times to get the estimates, SEs ad bias
 
 boot(ghproject_tidy, boot.fn, 1000)
 
