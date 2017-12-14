@@ -16,3 +16,5 @@ knitr
 GGally
 bindrcpp
 boot
+lattice
+caret
