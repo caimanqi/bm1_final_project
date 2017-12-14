@@ -1,0 +1,197 @@
+---
+title: "slr.vs.mlr"
+author: "Manqi Cai"
+date: "12/13/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=F, message=F, include=F}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(DT)
+library(janitor)
+library(stringr)
+library(lubridate)
+library(knitr)
+library(GGally) # correlation matrix
+library(ggplot2)
+```
+
+
+```{r load_data_set}
+ghproject <- read_excel("GHProject_Dataset.xlsx") %>% 
+  clean_names()
+
+#summary of continuous variable
+ghproject %>% 
+  select(losdays2, evisit, ageyear, bmi:bpdiastolic) %>% 
+  summary() %>% 
+  na.omit() %>% 
+  knitr::kable()
+
+#summary of categorical data
+##### NEEDS TO BE DONE #####
+ghproject %>% 
+  select()
+
+#summary of PatientID and VisitID
+ghproject %>% 
+  distinct(patientid) %>% 
+  count()
+
+ghproject %>% 
+  distinct(visitid) %>% 
+  count()
+
+```
+There are 3682 records from 3612 patients
+
+```{r clean_data}
+GHProject_Dataset <- read_excel("GHProject_Dataset.xlsx") %>% clean_names() #load data
+
+#remove duplicated patients
+ghproject_remove <- GHProject_Dataset[!duplicated(GHProject_Dataset[c('patientid')]),]
+
+
+#
+##recode variables
+ghproject_tidy <- ghproject_remove %>% 
+  mutate(gender = ifelse(gender == "Male", "1","0" )) %>% #recode gender
+  mutate(maritalstatus = ifelse(maritalstatus == "Married","1","0"), #recode marital status
+         cindex = recode(cindex, #recode cindex
+                         "0" = "0",
+                         "1" = "0",
+                         "2" = "1",
+                         "3" = "1",
+                         "4" = "2",
+                         "5" = "2"),
+         insurancetype = recode(insurancetype, #recode insurance type
+                                "NA" = "0",
+                                "Private" = "1",
+                                "Medicare" = "2",
+                                "Medicaid" = "3"),
+         mews = recode(mews, #recode mews
+                       "NA" = "0",
+                       "0" = "1",
+                       "1" = "1",
+                       "2" = "2",
+                       "3" = "2",
+                       "4" = "3",
+                       "5" = "3",
+                       "6"= "4",
+                       "7"= "4",
+                       "8"= "4",
+                       "9"= "4",
+                       "10"= "4",
+                       "11"= "4",
+                       "12"= "4",
+                       "13"= "4",
+                       "14" = "4"),
+         religion = ifelse(religion == "No Affiliation", "0", "1"), #recode religion
+         losdays2_log = log(losdays2),
+         id = 1:nrow(ghproject_remove)) %>% 
+  separate(admitdtm, into= c("day", "month", "year"), sep = ", ", convert = TRUE) %>% #recode admission date to month
+  mutate(month = str_replace(month, "[0-9]", ""))%>% 
+  mutate(month = str_replace(month, "[0-9]", ""))%>%
+  mutate(month = str_replace(month, " ", ""))%>%
+  mutate(month = recode(month,
+                        "January" = "1",
+                        "February" = "2",
+                        "March" = "3",
+                        "April" = "4",
+                        "May" = "5",
+                        "June" = "6",
+                        "July" = "7",
+                        "August" = "8",
+                        "September" = "9",
+                        "October" = "10",
+                        "November" = "11",
+                        "December" = "12")) %>% 
+  select(-c(day, year, patientid, visitid, postalcode, facilityname, facilityzip, race)) %>% #remove unneeded variables
+    na.omit() 
+
+ghproject_tidy$mews <- as.integer(as.character(ghproject_tidy$mews))
+
+ghproject_tidy$cindex <- as.integer(as.character(ghproject_tidy$cindex))
+
+ghproject_tidy$month <- as.integer(as.character(ghproject_tidy$month))
+
+ghproject_tidy$gender <- as.integer(as.character(ghproject_tidy$gender))
+
+ghproject_tidy$religion <- as.integer(as.character(ghproject_tidy$religion))
+
+ghproject_tidy$maritalstatus <- as.integer(as.character(ghproject_tidy$maritalstatus))
+
+ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurancetype))
+
+```
+
+```{r}
+
+
+#SLR for each variable
+SLR_is30dayreadmit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit)
+#confint(SLR_is30dayreadmit)
+#coef(summary(SLR_is30dayreadmit))
+row_is30dayreadmit <- cbind(coef(summary(SLR_is30dayreadmit))[, c(1:2, 4)], confint(SLR_is30dayreadmit))[-1, ]
+
+
+SLR_cindex <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$cindex)
+row_cindex <- cbind(coef(summary(SLR_cindex))[, c(1:2, 4)], confint(SLR_cindex))[-1, ]
+
+
+SLR_evisit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$evisit)
+row_evisit <- cbind(coef(summary(SLR_evisit))[, c(1:2, 4)], confint(SLR_evisit))[-1, ]
+
+
+SLR_ageyear <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$ageyear)
+row_ageyear <- cbind(coef(summary(SLR_ageyear))[, c(1:2, 4)], confint(SLR_ageyear))[-1, ]
+
+
+SLR_gender <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$gender)
+row_gender <- cbind(coef(summary(SLR_gender))[, c(1:2, 4)], confint(SLR_gender))[-1, ]
+
+
+SLR_maritalstatus <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$maritalstatus)
+row_maritalstatus <- cbind(coef(summary(SLR_maritalstatus))[, c(1:2, 4)], confint(SLR_maritalstatus))[-1, ]
+
+SLR_insurancetype <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$insurancetype)
+row_insurancetype <- cbind(coef(summary(SLR_insurancetype))[, c(1:2, 4)], confint(SLR_insurancetype))[-1, ]
+
+SLR_bpsystolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpsystolic)
+row_bpsystolic <- cbind(coef(summary(SLR_bpsystolic))[, c(1:2, 4)], confint(SLR_bpsystolic))[-1, ]
+
+
+SLR_o2sat <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$o2sat)
+row_o2sat <- cbind(coef(summary(SLR_o2sat))[, c(1:2, 4)], confint(SLR_o2sat))[-1, ]
+
+
+SLR_heartrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$heartrate)
+row_heartrate <- cbind(coef(summary(SLR_heartrate))[, c(1:2, 4)], confint(SLR_heartrate))[-1, ]
+
+
+SLR_respirationrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$respirationrate)
+row_respirationrate <- cbind(coef(summary(SLR_respirationrate))[, c(1:2, 4)], confint(SLR_respirationrate))[-1, ]
+
+
+SLR_bpdiastolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpdiastolic)
+row_bpdiastolic <- cbind(coef(summary(SLR_bpdiastolic))[, c(1:2, 4)], confint(SLR_bpdiastolic))[-1, ]
+
+SLR_res <- rbind(row_is30dayreadmit, row_cindex, row_evisit, row_ageyear, row_gender, row_maritalstatus, row_insurancetype, row_bpsystolic, row_o2sat, row_heartrate, row_respirationrate, row_bpdiastolic)
+
+
+#MLR
+MLR_ghprojrct <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit + ghproject_tidy$cindex + ghproject_tidy$evisit + ghproject_tidy$ageyear + ghproject_tidy$gender +ghproject_tidy$maritalstatus +ghproject_tidy$insurancetype + ghproject_tidy$bpsystolic + ghproject_tidy$o2sat + ghproject_tidy$heartrate + ghproject_tidy$respirationrate + ghproject_tidy$bpdiastolic)
+#summary(MLR_ghprojrct)
+MLR_coef <- coef(summary(MLR_ghprojrct))[,c(1:2,4)]
+MLR_conf<- confint(MLR_ghprojrct)
+MLR_res <- cbind(MLR_coef, MLR_conf)[-1,]
+
+cbind(SLR_res, MLR_res)
+```
+
