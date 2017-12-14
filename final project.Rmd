@@ -257,6 +257,7 @@ plot(reg)
 ```
 
 ```{r}
+<<<<<<< HEAD
 
 
 # load the library
@@ -269,5 +270,32 @@ grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
 model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit +  gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=ghproject_tidy, trControl=train_control, method='lm')
 # summarize results
 print(model)
+=======
+library(boot)     
+##bootstrap
+set.seed(1)
+
+# Our usual regression, no bootstrap yet
+boot.fn<-function(data, index){
+	return(coef(lm(losdays2_log ~ + is30dayreadmit + ageyear + month + cindex + evisit + ageyear + gender + religion + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic,data=ghproject_tidy,subset=index)))
+}
+boot.fn(ghproject_tidy,1:2709)
+
+# Compute the estimates by sampling with replacement
+# Sample chooses 2709 observations from 2709, with replacement
+# Might have duplicates
+set.seed(1)
+
+# One draw
+boot.fn(ghproject_tidy,sample(2709,2709,replace=T))
+
+# Use function boot() to repeat the sampling 1000 times.
+# Repeat 1000 times to get the estimates, SEs ad bias
+
+boot(ghproject_tidy, boot.fn, 1000)
+
+# How does it compare to the original (non-bootstrap) estimates?
+summary(reg)
+>>>>>>> master
 ```
 

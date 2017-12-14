@@ -15,5 +15,9 @@ lubridate
 knitr
 GGally
 bindrcpp
+<<<<<<< HEAD
 lattice
 caret
+=======
+boot
+>>>>>>> master
