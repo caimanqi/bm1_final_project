@@ -31,7 +31,7 @@ ghproject <- read_excel("GHProject_Dataset.xlsx") %>%
 
 #summary of continuous variable
 ghproject %>% 
-  select(losdays2, evisit, ageyear, bmi:bpdiastolic) %>% 
+  select(losdays2, ageyear, bmi:bpdiastolic) %>% 
   summary() %>% 
   na.omit() %>% 
   knitr::kable()
@@ -39,23 +39,45 @@ ghproject %>%
 #summary of categorical data
 ##### NEEDS TO BE DONE #####
 ghproject %>% 
-  select()
+  group_by(mews) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(cindex) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(evisit) %>% 
+  summarize(n())
+
+ghproject %>% 
+  group_by(icu_flag) %>% 
+  summarize(n())
 
 ghproject %>% 
   group_by(gender) %>% 
-  count()
-ghproject %>% 
-  group_by(religion) %>% 
-  count()
+  summarize(n())
+
 ghproject %>% 
   group_by(race) %>% 
-  count()
+  summarize(n())
+
+ghproject %>% 
+  group_by(religion) %>% 
+  summarize(n())
+
 ghproject %>% 
   group_by(maritalstatus) %>% 
-  count()
+  summarize(n())
+
+ghproject %>% 
+  group_by(facilityname) %>% 
+  summarize(n())
+
 ghproject %>% 
   group_by(insurancetype) %>% 
-  count()
+  summarize(n())
+
 #summary of PatientID and VisitID
 ghproject %>% 
   distinct(patientid) %>% 
@@ -148,26 +170,29 @@ ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurance
 
 ```
 
+```{r exploratory}
+attach(ghproject_tidy)
+
+hist(losdays2)
+hist(sqrt(losdays2))
+hist(losdays2_log)
+
+hist(ageyear)
+#hist(bmi)
+hist(bpsystolic)
+hist(log(o2sat))
+#hist(temperature)
+hist(log(heartrate))
+hist(log(respirationrate))
+hist(bpdiastolic)
+```
 
 ```{r correlation_matrix}
 # correlation matrix for numeric variables, saturated
-ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
+ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
 
 # no significant linear trend ??
 
-# correlation matrix, from smaller SAS model
-ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic", "heartrate","respirationrate", "losdays2_log"))
-```
-
-```{r}
-ghproject_tidy %>% 
-  mutate(heartrate_log = log(heartrate)) %>% 
-  ggplot(aes(x = heartrate_log)) +
-  geom_histogram()
-
-ghproject_tidy %>% 
-  ggplot(aes(x = heartrate)) +
-  geom_histogram()
 ```
 
 
@@ -207,15 +232,51 @@ AdjR2: 0.1169
 
 AIC: 1743.8
 
-since Forward and Stepwise agree, and using principle of parsimony, choose smaller model
 
-```{r}
-#Use criterion-based procedures to guide your selection of the ‘best subset’ (Cp, AIC, BIC, ...)
+All models agree
+
+
+
+```{r linear_model_each}
+reg_30 <- lm(losdays2_log ~ is30dayreadmit, ghproject_tidy)
+summary(reg_30)
+
+reg_cindex <- lm(losdays2_log ~ cindex, ghproject_tidy)
+summary(reg_cindex)
+
+reg_evisit <- lm(losdays2_log ~ evisit, ghproject_tidy)
+summary(reg_evisit)
+
+reg_age <- lm(losdays2_log ~ ageyear, ghproject_tidy)
+summary(reg_age)
+
+reg_gender <- lm(losdays2_log ~ gender, ghproject_tidy)
+summary(reg_gender)
+
+reg_marital <- lm(losdays2_log ~ maritalstatus, ghproject_tidy)
+summary(reg_marital)
+
+reg_insurance <- lm(losdays2_log ~ insurancetype, ghproject_tidy)
+summary(reg_insurance)
+
+reg_bps <- lm(losdays2_log ~ bpsystolic, ghproject_tidy)
+summary(reg_bps)
+
+reg_o2 <- lm(losdays2_log ~ o2sat, ghproject_tidy)
+summary(reg_o2)
+
+reg_heart <- lm(losdays2_log ~ heartrate, ghproject_tidy)
+summary(reg_heart)
+
+reg_resp <- lm(losdays2_log ~ respirationrate, ghproject_tidy)
+summary(reg_resp)
+
+reg_bpd <- lm(losdays2_log ~ bpdiastolic, ghproject_tidy)
+summary(reg_bpd)
 ```
 
-
-```{r linear_model for stepwise}
-reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear + month + cindex + evisit + ageyear + gender + religion + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
+```{r full_linear_model}
+reg <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex + evisit + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate, ghproject_tidy)
 
 summary(reg)
 
@@ -233,7 +294,7 @@ train_control <- trainControl(method="cv", number=10)
 # fix the parameters of the algorithm
 grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
 # train the model
-model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit +  gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=ghproject_tidy, trControl=train_control, method='lm')
+model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=ghproject_tidy, trControl=train_control, method='lm')
 # summarize results
 print(model)
 ```
