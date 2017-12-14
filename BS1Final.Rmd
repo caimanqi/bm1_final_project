@@ -364,5 +364,7 @@ model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gen
 print(model)
 ```
 
-The MSE we get from bootstrap model is 0.832, and MSE in our model is 0.831, the difference between these two MSE is about 0.1%, which is a lot less than 10%. Therefore, after model validation, we think our model is reasonalbe for predict LOS. 
+The MSE we get from bootstrap model is 0.7401364, and MSE in our model is 0.7458, the difference between these two MSE is about 0.8%, which is a lot less than the threshold 10%. Therefore, after model validation, we think our model is reasonalbe for predict LOS. 
+
+(i don't think the code above is bootstrapping)
 
