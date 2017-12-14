@@ -15,3 +15,5 @@ lubridate
 knitr
 GGally
 bindrcpp
+lattice
+caret

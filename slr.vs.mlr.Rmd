@@ -1,15 +1,13 @@
 ---
-title: "Biostatistics Methods 1 Final Project"
-author: "Manqi Cai, Yixi Xu, Peng-Lin Lin, Kaitlin Maciejewski"
-date: "12/9/2017"
+title: "slr.vs.mlr"
+author: "Manqi Cai"
+date: "12/13/2017"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
-
-The Data Analytics group from Good Health Corporation are interested in improving the overall hospital management and minimizing the cost/resources associated with patients' care. One of the most important outcomes that has a direct effect on these aspects is patient's length of stay (LoS) in the hospital. Thus, they would like to know which variables are associated with LoS, and ultimately build a predictive model to be used for future visits. The group has contacted you to study this problem and make a recommendation.
 
 ```{r, warning=F, message=F, include=F}
 library(tidyverse)
@@ -131,143 +129,69 @@ ghproject_tidy$maritalstatus <- as.integer(as.character(ghproject_tidy$maritalst
 
 ghproject_tidy$insurancetype <- as.integer(as.character(ghproject_tidy$insurancetype))
 
-p1 <- ghproject_tidy %>% 
-  group_by(mews) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-p2 <- ghproject_tidy %>% 
-  group_by(cindex) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-p3 <- ghproject_tidy %>% 
-  group_by(month) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-p4 <- ghproject_tidy %>% 
-  group_by(gender) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-p5 <- ghproject_tidy %>% 
-  group_by(religion) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-p6 <- ghproject_tidy %>% 
-  group_by(maritalstatus) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-
-p7 <- ghproject_tidy %>% 
-  group_by(insurancetype ) %>% 
-  count() %>% 
-  na.omit() %>% 
-  knitr::kable()
-
-newtable <- cbind(p1, p2, p3, p4, p5, p6, p7)
-newtable %>% 
-  DT::datatable()
-```
-
-
-```{r correlation_matrix}
-# correlation matrix for numeric variables, saturated
-ggpairs(ghproject_tidy, columns = c("month", "ageyear", "bmi", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
-
-# no significant linear trend ??
-
-# correlation matrix, from smaller SAS model
-ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic", "heartrate","respirationrate", "losdays2_log"))
-```
-
-```{r}
-ghproject_tidy %>% 
-  mutate(heartrate_log = log(heartrate)) %>% 
-  ggplot(aes(x = heartrate_log)) +
-  geom_histogram()
-
-ghproject_tidy %>% 
-  ggplot(aes(x = heartrate)) +
-  geom_histogram()
-```
-
-
-```{r write_csv_for_SAS, eval=FALSE}
-write_csv(ghproject_tidy, "ghproject_saturated.csv")
-```
-
-
-#SAS output:
-
-##Forward
-
-###significant variables:
-ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
-
-AdjR2: 0.1169
-
-AIC: 1743.8
-
-
-##Backward
-
-###significant variables:
-month, mews, icu_flag, temperature, bmi, o2sat, religion, gender, bpdiastolic, maritalstatus, insurancetype
-
-AdjR2: 0.1169
-
-AIC: 1743.8
-
-
-##Stepwise
-
-###significant variables:
-ageyear, evisit, bpsystolic, cindex, heartrate, is30dayreadmit, respirationrate
-
-AdjR2: 0.1169
-
-AIC: 1743.8
-
-since Forward and Stepwise agree, and using principle of parsimony, choose smaller model
-
-```{r}
-#Use criterion-based procedures to guide your selection of the ‘best subset’ (Cp, AIC, BIC, ...)
-```
-
-
-```{r linear_model for stepwise}
-reg <- lm(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit +  gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, ghproject_tidy)
-
-summary(reg)
-
-confint(reg)
-
-par(mfrow=c(2,2))
-plot(reg)
 ```
 
 ```{r}
 
 
-# load the library
-library(caret)
-# define training control
-train_control <- trainControl(method="cv", number=10)
-# fix the parameters of the algorithm
-grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
-# train the model
-model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit +  gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=ghproject_tidy, trControl=train_control, method='lm')
-# summarize results
-print(model)
+#SLR for each variable
+SLR_is30dayreadmit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit)
+#confint(SLR_is30dayreadmit)
+#coef(summary(SLR_is30dayreadmit))
+row_is30dayreadmit <- cbind(coef(summary(SLR_is30dayreadmit))[, c(1:2, 4)], confint(SLR_is30dayreadmit))[-1, ]
+
+
+SLR_cindex <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$cindex)
+row_cindex <- cbind(coef(summary(SLR_cindex))[, c(1:2, 4)], confint(SLR_cindex))[-1, ]
+
+
+SLR_evisit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$evisit)
+row_evisit <- cbind(coef(summary(SLR_evisit))[, c(1:2, 4)], confint(SLR_evisit))[-1, ]
+
+
+SLR_ageyear <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$ageyear)
+row_ageyear <- cbind(coef(summary(SLR_ageyear))[, c(1:2, 4)], confint(SLR_ageyear))[-1, ]
+
+
+SLR_gender <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$gender)
+row_gender <- cbind(coef(summary(SLR_gender))[, c(1:2, 4)], confint(SLR_gender))[-1, ]
+
+
+SLR_maritalstatus <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$maritalstatus)
+row_maritalstatus <- cbind(coef(summary(SLR_maritalstatus))[, c(1:2, 4)], confint(SLR_maritalstatus))[-1, ]
+
+SLR_insurancetype <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$insurancetype)
+row_insurancetype <- cbind(coef(summary(SLR_insurancetype))[, c(1:2, 4)], confint(SLR_insurancetype))[-1, ]
+
+SLR_bpsystolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpsystolic)
+row_bpsystolic <- cbind(coef(summary(SLR_bpsystolic))[, c(1:2, 4)], confint(SLR_bpsystolic))[-1, ]
+
+
+SLR_o2sat <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$o2sat)
+row_o2sat <- cbind(coef(summary(SLR_o2sat))[, c(1:2, 4)], confint(SLR_o2sat))[-1, ]
+
+
+SLR_heartrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$heartrate)
+row_heartrate <- cbind(coef(summary(SLR_heartrate))[, c(1:2, 4)], confint(SLR_heartrate))[-1, ]
+
+
+SLR_respirationrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$respirationrate)
+row_respirationrate <- cbind(coef(summary(SLR_respirationrate))[, c(1:2, 4)], confint(SLR_respirationrate))[-1, ]
+
+
+SLR_bpdiastolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpdiastolic)
+row_bpdiastolic <- cbind(coef(summary(SLR_bpdiastolic))[, c(1:2, 4)], confint(SLR_bpdiastolic))[-1, ]
+
+SLR_res <- rbind(row_is30dayreadmit, row_cindex, row_evisit, row_ageyear, row_gender, row_maritalstatus, row_insurancetype, row_bpsystolic, row_o2sat, row_heartrate, row_respirationrate, row_bpdiastolic)
+
+
+#MLR
+MLR_ghprojrct <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit + ghproject_tidy$cindex + ghproject_tidy$evisit + ghproject_tidy$ageyear + ghproject_tidy$gender +ghproject_tidy$maritalstatus +ghproject_tidy$insurancetype + ghproject_tidy$bpsystolic + ghproject_tidy$o2sat + ghproject_tidy$heartrate + ghproject_tidy$respirationrate + ghproject_tidy$bpdiastolic)
+#summary(MLR_ghprojrct)
+MLR_coef <- coef(summary(MLR_ghprojrct))[,c(1:2,4)]
+MLR_conf<- confint(MLR_ghprojrct)
+MLR_res <- cbind(MLR_coef, MLR_conf)[-1,]
+
+cbind(SLR_res, MLR_res)
 ```
 
