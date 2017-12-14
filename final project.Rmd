@@ -41,6 +41,21 @@ ghproject %>%
 ghproject %>% 
   select()
 
+ghproject %>% 
+  group_by(gender) %>% 
+  count()
+ghproject %>% 
+  group_by(religion) %>% 
+  count()
+ghproject %>% 
+  group_by(race) %>% 
+  count()
+ghproject %>% 
+  group_by(maritalstatus) %>% 
+  count()
+ghproject %>% 
+  group_by(insurancetype) %>% 
+  count()
 #summary of PatientID and VisitID
 ghproject %>% 
   distinct(patientid) %>% 
@@ -222,4 +237,6 @@ model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit +  ge
 # summarize results
 print(model)
 ```
+
+The MSE we get from bootstrap model is 0.832, and MSE in our model is 0.831, the difference between these two MSE is about 0.1%, which is a lot less than 10%. Therefore, after model validation, we think our model is reasonalbe for predict LOS. 
 
