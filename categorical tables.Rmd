@@ -3,126 +3,24 @@ output: pdf_document
 ---
 \begin{table}[]
 \centering
-\begin{tabular}{|l|l|}
-\hline
-MEWS          & count \\ \hline
-0             & 39    \\ \hline
-1             & 618   \\ \hline
-2             & 730   \\ \hline
-3             & 801   \\ \hline
-4             & 711   \\ \hline
-5             & 328   \\ \hline
-\textgreater5 & 289   \\ \hline
-NA            & 166   \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-cindex & count \\ \hline
-0      & 1207  \\ \hline
-1      & 636   \\ \hline
-2      & 722   \\ \hline
-3      & 435   \\ \hline
-4      & 0     \\ \hline
-5      & 682   \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-evisit & count \\ \hline
-0      & 1134  \\ \hline
-1      & 752   \\ \hline
-2      & 521   \\ \hline
-3      & 329   \\ \hline
-4      & 946   \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-icu flag & count \\ \hline
-0        & 3618  \\ \hline
-1        & 64    \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-gender  & count \\ \hline
-male    & 1701  \\ \hline
-females & 1981  \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-gender  & count \\ \hline
-male    & 1701  \\ \hline
-females & 1981  \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-religion           & count \\ \hline
-Angelican          & 1     \\ \hline
-Catholic           & 1678  \\ \hline
-Christian          & 909   \\ \hline
-Hebrew             & 1     \\ \hline
-Hindu              & 127   \\ \hline
-Islam              & 112   \\ \hline
-Jewish             & 527   \\ \hline
-Mormon             & 2     \\ \hline
-No Affiliation     & 177   \\ \hline
-Non Denominational & 1     \\ \hline
-Other              & 147   \\ \hline
-\end{tabular}
-\end{table}
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-marital status & count \\ \hline
-Civil Union   & 1     \\ \hline
-Divorced      & 241   \\ \hline
-Married       & 1637  \\ \hline
-Separated     & 52    \\ \hline
-Single        & 967   \\ \hline
-Widowed       & 704   \\ \hline
-NA            & 80    \\ \hline
-\end{tabular}
-\end{table}
-
-
-\begin{table}[]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-insurance type & count \\ \hline
-Medicaid      & 170   \\ \hline
-Medicare      & 1457  \\ \hline
-Private       & 2021  \\ \hline
-NA            & 34    \\ \hline
+\label{my-label}
+\begin{tabular}{lllllllllll}
+\cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11}
+\multicolumn{1}{|l|}{ICU flag} & \multicolumn{1}{l|}{count} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Religion}           & \multicolumn{1}{l|}{count} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{MEWS}          & \multicolumn{1}{l|}{count} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Marital status} & \multicolumn{1}{l|}{count} \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{0}        & \multicolumn{1}{l|}{3618}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Angelican}          & \multicolumn{1}{l|}{1}     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{0}             & \multicolumn{1}{l|}{39}    & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Civil Union}    & \multicolumn{1}{l|}{1}     \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{1}        & \multicolumn{1}{l|}{64}    & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Catholic}           & \multicolumn{1}{l|}{1678}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{1}             & \multicolumn{1}{l|}{618}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Married}        & \multicolumn{1}{l|}{241}   \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+                               &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Christian}          & \multicolumn{1}{l|}{909}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{2}             & \multicolumn{1}{l|}{730}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Separated}      & \multicolumn{1}{l|}{1637}  \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{Gender}   & \multicolumn{1}{l|}{count} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Hebrew}             & \multicolumn{1}{l|}{1}     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{3}             & \multicolumn{1}{l|}{801}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Single}         & \multicolumn{1}{l|}{967}   \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{male}     & \multicolumn{1}{l|}{1701}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Hindu}              & \multicolumn{1}{l|}{127}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{4}             & \multicolumn{1}{l|}{711}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Widowed}        & \multicolumn{1}{l|}{704}   \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{female}   & \multicolumn{1}{l|}{1981}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Islam}              & \multicolumn{1}{l|}{112}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{5}             & \multicolumn{1}{l|}{328}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{NA}             & \multicolumn{1}{l|}{80}    \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+                               &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Jewish}             & \multicolumn{1}{l|}{527}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{\textgreater5} & \multicolumn{1}{l|}{289}   &                       &                                     &                            \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{Cindex}   & \multicolumn{1}{l|}{count} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Mormon}             & \multicolumn{1}{l|}{2}     & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{NA}            & \multicolumn{1}{l|}{166}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Evisit}         & \multicolumn{1}{l|}{count} \\ \cline{1-2} \cline{4-5} \cline{7-8} \cline{10-11} 
+\multicolumn{1}{|l|}{0}        & \multicolumn{1}{l|}{1207}  & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{No Affiliation}     & \multicolumn{1}{l|}{177}   &                       &                                    &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{0}              & \multicolumn{1}{l|}{1134}  \\ \cline{1-2} \cline{4-5} \cline{10-11} 
+\multicolumn{1}{|l|}{1}        & \multicolumn{1}{l|}{636}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Non Denominational} & \multicolumn{1}{l|}{1}     &                       &                                    &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{1}              & \multicolumn{1}{l|}{752}   \\ \cline{1-2} \cline{4-5} \cline{10-11} 
+\multicolumn{1}{|l|}{2}        & \multicolumn{1}{l|}{722}   & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{Other}              & \multicolumn{1}{l|}{147}   &                       &                                    &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{2}              & \multicolumn{1}{l|}{521}   \\ \cline{1-2} \cline{4-5} \cline{10-11} 
+\multicolumn{1}{|l|}{3}        & \multicolumn{1}{l|}{435}   &                       &                                         &                            &                       &                                    &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{3}              & \multicolumn{1}{l|}{329}   \\ \cline{1-2} \cline{10-11} 
+\multicolumn{1}{|l|}{4}        & \multicolumn{1}{l|}{0}     &                       &                                         &                            &                       &                                    &                            & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{4}              & \multicolumn{1}{l|}{946}   \\ \cline{1-2} \cline{10-11} 
+\multicolumn{1}{|l|}{5}        & \multicolumn{1}{l|}{682}   &                       &                                         &                            &                       &                                    &                            &                       &                                     &                            \\ \cline{1-2}
+                               &                            &                       &                                         &                            &                       &                                    &                            &                       &                                     &                           
 \end{tabular}
 \end{table}
