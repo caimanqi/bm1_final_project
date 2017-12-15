@@ -385,8 +385,6 @@ print(model)
 
 
 ```{r}
-
-
 #SLR for each variable
 SLR_is30dayreadmit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit)
 #confint(SLR_is30dayreadmit)
