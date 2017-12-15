@@ -25,7 +25,7 @@ library(ggplot2)
 ```
 
 
-```{r load_data_set, include=F}
+```{r load_data_set, include=T}
 ghproject <- read_excel("GHProject_Dataset.xlsx") %>% 
   clean_names()
 
