@@ -1,0 +1,128 @@
+---
+output: pdf_document
+---
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+MEWS          & count \\ \hline
+0             & 39    \\ \hline
+1             & 618   \\ \hline
+2             & 730   \\ \hline
+3             & 801   \\ \hline
+4             & 711   \\ \hline
+5             & 328   \\ \hline
+\textgreater5 & 289   \\ \hline
+NA            & 166   \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+cindex & count \\ \hline
+0      & 1207  \\ \hline
+1      & 636   \\ \hline
+2      & 722   \\ \hline
+3      & 435   \\ \hline
+4      & 0     \\ \hline
+5      & 682   \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+evisit & count \\ \hline
+0      & 1134  \\ \hline
+1      & 752   \\ \hline
+2      & 521   \\ \hline
+3      & 329   \\ \hline
+4      & 946   \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+icu flag & count \\ \hline
+0        & 3618  \\ \hline
+1        & 64    \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+gender  & count \\ \hline
+male    & 1701  \\ \hline
+females & 1981  \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+gender  & count \\ \hline
+male    & 1701  \\ \hline
+females & 1981  \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+religion           & count \\ \hline
+Angelican          & 1     \\ \hline
+Catholic           & 1678  \\ \hline
+Christian          & 909   \\ \hline
+Hebrew             & 1     \\ \hline
+Hindu              & 127   \\ \hline
+Islam              & 112   \\ \hline
+Jewish             & 527   \\ \hline
+Mormon             & 2     \\ \hline
+No Affiliation     & 177   \\ \hline
+Non Denominational & 1     \\ \hline
+Other              & 147   \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+marital status & count \\ \hline
+Civil Union   & 1     \\ \hline
+Divorced      & 241   \\ \hline
+Married       & 1637  \\ \hline
+Separated     & 52    \\ \hline
+Single        & 967   \\ \hline
+Widowed       & 704   \\ \hline
+NA            & 80    \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+insurance type & count \\ \hline
+Medicaid      & 170   \\ \hline
+Medicare      & 1457  \\ \hline
+Private       & 2021  \\ \hline
+NA            & 34    \\ \hline
+\end{tabular}
+\end{table}
