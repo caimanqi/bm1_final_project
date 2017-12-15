@@ -224,12 +224,10 @@ hist(respirationrate)
 hist(bpdiastolic)
 ```
 
-```{r correlation_matrix, include=F}
+```{r correlation_matrix}
 # correlation matrix for numeric variables, saturated
+
 ggpairs(ghproject_tidy, columns = c("ageyear", "bpsystolic","o2sat","temperature", "heartrate","respirationrate", "bpdiastolic","losdays2_log"))
-
-# no significant linear trend ??
-
 ```
 
 
@@ -274,45 +272,7 @@ All models agree
 
 
 
-```{r linear_model_each, include=F}
-reg_30 <- lm(losdays2_log ~ is30dayreadmit, ghproject_tidy)
-summary(reg_30)
-
-reg_cindex <- lm(losdays2_log ~ cindex, ghproject_tidy)
-summary(reg_cindex)
-
-reg_evisit <- lm(losdays2_log ~ evisit, ghproject_tidy)
-summary(reg_evisit)
-
-reg_age <- lm(losdays2_log ~ ageyear, ghproject_tidy)
-summary(reg_age)
-
-reg_gender <- lm(losdays2_log ~ gender, ghproject_tidy)
-summary(reg_gender)
-
-reg_marital <- lm(losdays2_log ~ maritalstatus, ghproject_tidy)
-summary(reg_marital)
-
-reg_insurance <- lm(losdays2_log ~ insurancetype, ghproject_tidy)
-summary(reg_insurance)
-
-reg_bps <- lm(losdays2_log ~ bpsystolic, ghproject_tidy)
-summary(reg_bps)
-
-reg_o2 <- lm(losdays2_log ~ o2sat, ghproject_tidy)
-summary(reg_o2)
-
-reg_heart <- lm(losdays2_log ~ heartrate, ghproject_tidy)
-summary(reg_heart)
-
-reg_resp <- lm(losdays2_log ~ respirationrate, ghproject_tidy)
-summary(reg_resp)
-
-reg_bpd <- lm(losdays2_log ~ bpdiastolic, ghproject_tidy)
-summary(reg_bpd)
-```
-
-```{r full_linear_model, include=F}
+```{r full_linear_model}
 reg <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex  + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate, ghproject_tidy)
 
 summary(reg)
@@ -351,6 +311,8 @@ confint(reg_no_outliers)
 par(mfrow=c(2,2))
 plot(reg_no_outliers)
 
+## remove o2sat
+
 reg_no_outliers_1 <- lm(losdays2_log ~ is30dayreadmit + ageyear +  cindex  + insurancetype + bpsystolic + heartrate +  respirationrate, data_no_outliers)
 
 summary(reg_no_outliers_1)
@@ -359,7 +321,7 @@ par(mfrow=c(2,2))
 plot(reg_no_outliers_1)
 ```
 
-```{r, include=F}
+```{r model validation}
 set.seed(1)
 ##boostrap method
 # load the library
@@ -369,7 +331,7 @@ train_control <- trainControl(method="boot", number=1000)
 # fix the parameters of the algorithm
 grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
 # train the model
-model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=data_no_outliers, trControl=train_control, method='lm')
+model <- train(losdays2_log ~ is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + heartrate +  respirationrate + bpdiastolic, data=data_no_outliers, trControl=train_control, method='lm')
 # summarize results
 print(model)
 ```
@@ -386,7 +348,7 @@ train_control <- trainControl(method="cv", number=10)
 # fix the parameters of the algorithm
 grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
 # train the model
-model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + o2sat + heartrate +  respirationrate + bpdiastolic, data=data_no_outliers, trControl=train_control, method='lm')
+model <- train(losdays2_log ~ + is30dayreadmit + ageyear + cindex + evisit + gender + maritalstatus + insurancetype + bpsystolic + heartrate +  respirationrate + bpdiastolic, data=data_no_outliers, trControl=train_control, method='lm')
 # summarize results
 print(model)
 ```
@@ -394,58 +356,54 @@ print(model)
 
 ```{r echo = FALSE}
 #SLR for each variable
-SLR_is30dayreadmit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit)
+SLR_is30dayreadmit <- lm(data_no_outliers$losdays2 ~ data_no_outliers$is30dayreadmit)
 #confint(SLR_is30dayreadmit)
 #coef(summary(SLR_is30dayreadmit))
 Is_30_Day_Readmit <- cbind(coef(summary(SLR_is30dayreadmit))[, c(1:2, 4)], confint(SLR_is30dayreadmit))[-1, ]
 
 
-SLR_cindex <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$cindex)
+SLR_cindex <- lm(data_no_outliers$losdays2 ~ data_no_outliers$cindex)
 Cindex <- cbind(coef(summary(SLR_cindex))[, c(1:2, 4)], confint(SLR_cindex))[-1, ]
 
 
-SLR_evisit <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$evisit)
+SLR_evisit <- lm(data_no_outliers$losdays2 ~ data_no_outliers$evisit)
 Evisit <- cbind(coef(summary(SLR_evisit))[, c(1:2, 4)], confint(SLR_evisit))[-1, ]
 
 
-SLR_ageyear <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$ageyear)
+SLR_ageyear <- lm(data_no_outliers$losdays2 ~ data_no_outliers$ageyear)
 Age <- cbind(coef(summary(SLR_ageyear))[, c(1:2, 4)], confint(SLR_ageyear))[-1, ]
 
 
-SLR_gender <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$gender)
+SLR_gender <- lm(data_no_outliers$losdays2 ~ data_no_outliers$gender)
 Gender <- cbind(coef(summary(SLR_gender))[, c(1:2, 4)], confint(SLR_gender))[-1, ]
 
 
-SLR_maritalstatus <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$maritalstatus)
+SLR_maritalstatus <- lm(data_no_outliers$losdays2 ~ data_no_outliers$maritalstatus)
 Marital_Status <- cbind(coef(summary(SLR_maritalstatus))[, c(1:2, 4)], confint(SLR_maritalstatus))[-1, ]
 
-SLR_insurancetype <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$insurancetype)
+SLR_insurancetype <- lm(data_no_outliers$losdays2 ~ data_no_outliers$insurancetype)
 Insurance_Type <- cbind(coef(summary(SLR_insurancetype))[, c(1:2, 4)], confint(SLR_insurancetype))[-1, ]
 
-SLR_bpsystolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpsystolic)
+SLR_bpsystolic <- lm(data_no_outliers$losdays2 ~ data_no_outliers$bpsystolic)
 BP_Systolic_mmHg <- cbind(coef(summary(SLR_bpsystolic))[, c(1:2, 4)], confint(SLR_bpsystolic))[-1, ]
 
-
-SLR_o2sat <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$o2sat)
-O2_Saturation_percent <- cbind(coef(summary(SLR_o2sat))[, c(1:2, 4)], confint(SLR_o2sat))[-1, ]
-
-
-SLR_heartrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$heartrate)
+SLR_heartrate <- lm(data_no_outliers$losdays2 ~ data_no_outliers$heartrate)
 Heart_Rate_bpm <- cbind(coef(summary(SLR_heartrate))[, c(1:2, 4)], confint(SLR_heartrate))[-1, ]
 
 
-SLR_respirationrate <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$respirationrate)
+SLR_respirationrate <- lm(data_no_outliers$losdays2 ~ data_no_outliers$respirationrate)
 Respiration_Rate_bpm <- cbind(coef(summary(SLR_respirationrate))[, c(1:2, 4)], confint(SLR_respirationrate))[-1, ]
 
 
-SLR_bpdiastolic <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$bpdiastolic)
+SLR_bpdiastolic <- lm(data_no_outliers$losdays2 ~ data_no_outliers$bpdiastolic)
 BP_Diastolic_mmHg <- cbind(coef(summary(SLR_bpdiastolic))[, c(1:2, 4)], confint(SLR_bpdiastolic))[-1, ]
 
-SLR_res <- rbind(Is_30_Day_Readmit, Cindex, Evisit, Age, Gender, Marital_Status, Insurance_Type, BP_Systolic_mmHg, O2_Saturation_percent, Heart_Rate_bpm, Respiration_Rate_bpm, BP_Diastolic_mmHg)
+SLR_res <- rbind(Is_30_Day_Readmit, Cindex, Evisit, Age, Gender, Marital_Status, Insurance_Type, BP_Systolic_mmHg, Heart_Rate_bpm, Respiration_Rate_bpm, BP_Diastolic_mmHg)
 
 
 #MLR
-MLR_ghprojrct <- lm(ghproject_tidy$losdays2 ~ ghproject_tidy$is30dayreadmit + ghproject_tidy$cindex + ghproject_tidy$evisit + ghproject_tidy$ageyear + ghproject_tidy$gender +ghproject_tidy$maritalstatus +ghproject_tidy$insurancetype + ghproject_tidy$bpsystolic + ghproject_tidy$o2sat + ghproject_tidy$heartrate + ghproject_tidy$respirationrate + ghproject_tidy$bpdiastolic)
+MLR_ghprojrct <- lm(data_no_outliers$losdays2 ~ data_no_outliers$is30dayreadmit + data_no_outliers$cindex + data_no_outliers$evisit + data_no_outliers$ageyear + data_no_outliers$gender +data_no_outliers$maritalstatus +data_no_outliers$insurancetype + data_no_outliers$bpsystolic  + data_no_outliers$heartrate + data_no_outliers$respirationrate + data_no_outliers$bpdiastolic)
+
 #summary(MLR_ghprojrct)
 MLR_coef <- coef(summary(MLR_ghprojrct))[,c(1:2,4)]
 MLR_conf<- confint(MLR_ghprojrct)
@@ -466,8 +424,5 @@ sketch = htmltools::withTags(table(
 ))
 
 
-
-
-cbind(round(SLR_res,digits = 3), round(MLR_res, digits = 3)) %>% 
-  DT::datatable(caption = 'Table 2: Summary of continuous variable between SLR vs MLR.', container = sketch)
+cbind(round(SLR_res,digits = 3), round(MLR_res, digits = 3)) %>% DT::datatable(caption = 'Table 2: Summary of continuous variable between SLR vs MLR.', container = sketch)
 ```
